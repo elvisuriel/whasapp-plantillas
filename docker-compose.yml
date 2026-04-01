@@ -14,7 +14,9 @@ services:
       - postgres
       - redis
     volumes:
-      - ./backend:/app
+      - wwebjs_auth:/app/.wwebjs_auth   # Persiste la sesión de WhatsApp
+    shm_size: '256mb'                   # Necesario para Chromium/Puppeteer
+
   postgres:
     image: postgres:16-alpine
     container_name: whatsapp-db
@@ -27,6 +29,7 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+
   redis:
     image: redis:7-alpine
     container_name: whatsapp-redis
@@ -35,6 +38,8 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
 volumes:
   db_data:
   redis_data:
+  wwebjs_auth:
