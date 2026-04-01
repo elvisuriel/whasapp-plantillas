@@ -1,6 +1,3 @@
-  @ApiProperty({ required: false, description: 'Respuesta cruda de la API de WhatsApp' })
-  @Column({ type: 'json', nullable: true })
-  whatsappApiResponse?: any;
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -33,6 +30,10 @@ export class SendEntity {
   @ApiProperty({ example: 'success', description: 'success, error, pending' })
   @Column({ default: 'pending' })
   status: string;
+
+  @ApiProperty({ required: false, description: 'Respuesta del envío' })
+  @Column({ type: 'json', nullable: true })
+  whatsappApiResponse?: any;
 
   @ApiProperty()
   @CreateDateColumn()

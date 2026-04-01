@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { WhatsappApiService } from './whatsapp-api.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SendEntity } from './send.entity/send.entity';
@@ -10,19 +10,23 @@ export class SendService {
 	constructor(
 		@InjectRepository(SendEntity)
 		private readonly sendRepo: Repository<SendEntity>,
-		private readonly whatsappApi: WhatsappApiService,
+		private readonly whatsapp: WhatsappService,
 	) {}
 
 	async create(data: Partial<SendEntity>) {
 		const send = this.sendRepo.create(data);
-		let status = 'pending';
-		let apiResponse: any = null;
-		if (data.type === 'text' && data.recipient && data.message) {
-			apiResponse = await this.whatsappApi.sendTextMessage(data.recipient, data.message);
-			status = apiResponse.error ? 'error' : 'success';
+		let result: { success: boolean; error?: string } = { success: false };
+
+		if (data.recipient && data.message) {
+			if (data.type === 'image' && data.imageUrl) {
+				result = await this.whatsapp.sendImage(data.recipient, data.imageUrl, data.message);
+			} else {
+				result = await this.whatsapp.sendText(data.recipient, data.message);
+			}
 		}
-		send.status = status;
-		send.whatsappApiResponse = apiResponse;
+
+		send.status = result.success ? 'success' : 'error';
+		send.whatsappApiResponse = result;
 		const saved = await this.sendRepo.save(send);
 		return saved;
 	}

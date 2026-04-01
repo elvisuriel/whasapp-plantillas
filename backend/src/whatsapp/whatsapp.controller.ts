@@ -1,7 +1,7 @@
 import { Controller, Get, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { WhatsappService } from './whatsapp.service';
-import { Response } from 'express';
+import type { Response } from 'express';
 
 @ApiTags('whatsapp')
 @Controller('whatsapp')
